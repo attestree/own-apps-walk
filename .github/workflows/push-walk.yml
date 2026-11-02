@@ -9,6 +9,11 @@ on:
         description: 'The fixture version to publish (a release asset AttestreeWalk.PushApp-<version>.msi)'
         default: '1.0.0'
         required: true
+      target:
+        description: 'Which instance to publish to; each binds this workflow file on main'
+        type: choice
+        options: [homelab, customer-zero]
+        default: homelab
 
 permissions:
   contents: read
@@ -24,11 +29,11 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: gh release download "v1.0.0" --repo "$GITHUB_REPOSITORY" --pattern "AttestreeWalk.PushApp-${VERSION}.msi" --dir dist
 
-      - name: Publish to the homelab
+      - name: Publish
         uses: attestree/publish@v1
         with:
-          instance: https://agents-homelab.attestree.ch
-          audience: attestree:40ccb360-1b7f-4c65-a41c-a197ff72f7fe
+          instance: ${{ inputs.target == 'customer-zero' && 'https://custzero.attestree.ch' || 'https://agents-homelab.attestree.ch' }}
+          audience: ${{ inputs.target == 'customer-zero' && 'attestree:45c552d3-8d50-4962-a4d8-e2590f31bda6' || 'attestree:40ccb360-1b7f-4c65-a41c-a197ff72f7fe' }}
           package-id: AttestreeWalk.PushApp
           version: ${{ inputs.version }}
           installers: x64=dist/AttestreeWalk.PushApp-${{ inputs.version }}.msi
