@@ -1,0 +1,9 @@
+PackageIdentifier: AttestreeWalk.FolderApp
+PackageVersion: 1.0.0
+PackageLocale: en-US
+Publisher: Attestree (walk fixture)
+PackageName: Attestree Walk FolderApp
+License: Proprietary
+ShortDescription: "Acceptance-walk fixture for #4830. Installs one text file."
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

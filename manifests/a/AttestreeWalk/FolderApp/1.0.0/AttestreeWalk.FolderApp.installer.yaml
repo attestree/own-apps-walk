@@ -1,0 +1,11 @@
+PackageIdentifier: AttestreeWalk.FolderApp
+PackageVersion: 1.0.0
+InstallerType: msi
+Scope: machine
+Installers:
+- Architecture: x64
+  InstallerUrl: https://github.com/attestree/own-apps-walk/releases/download/v1.0.0/AttestreeWalk.FolderApp-1.0.0.msi
+  InstallerSha256: BF34DD6CC1E87E0C5955CAF37C9A0315B4E9F2FC53C2C33176F23C754197C3A1
+  ProductCode: '{C519FCAD-A574-4ADA-A4D5-EA07EF7E802E}'
+ManifestType: installer
+ManifestVersion: 1.6.0
