@@ -1,0 +1,34 @@
+# Acceptance walk for attestree/winget-enterprise-app#4830: a GitHub Actions push of an in-house app to an Attestree
+# instance with this job's OIDC identity. The instance's binding names this repository, this workflow file and main.
+name: push-walk
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The fixture version to publish (a release asset AttestreeWalk.PushApp-<version>.msi)'
+        default: '1.0.0'
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the fixture installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: gh release download "v1.0.0" --repo "$GITHUB_REPOSITORY" --pattern "AttestreeWalk.PushApp-${VERSION}.msi" --dir dist
+
+      - name: Publish to the homelab
+        uses: attestree/publish@v1
+        with:
+          instance: https://agents-homelab.attestree.ch
+          audience: attestree:40ccb360-1b7f-4c65-a41c-a197ff72f7fe
+          package-id: AttestreeWalk.PushApp
+          version: ${{ inputs.version }}
+          installers: x64=dist/AttestreeWalk.PushApp-${{ inputs.version }}.msi
