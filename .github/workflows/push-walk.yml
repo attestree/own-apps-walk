@@ -1,12 +1,19 @@
 # Acceptance walk for attestree/winget-enterprise-app#4830: a GitHub Actions push of an in-house app to an Attestree
 # instance with this job's OIDC identity. The instance's binding names this repository, this workflow file and main.
+# Its binding sits on the prefix AttestreeWalk.PushApp, so it also covers AttestreeWalk.PushApp.Two, the app #5529's
+# walk pushes as a first version.
 name: push-walk
 
 on:
   workflow_dispatch:
     inputs:
+      package-id:
+        description: 'The app to publish'
+        type: choice
+        options: [AttestreeWalk.PushApp, AttestreeWalk.PushApp.Two]
+        default: AttestreeWalk.PushApp
       version:
-        description: 'The fixture version to publish (a release asset AttestreeWalk.PushApp-<version>.msi)'
+        description: 'The fixture version to publish (a release asset <package-id>-<version>.msi)'
         default: '1.0.0'
         required: true
       target:
@@ -26,14 +33,15 @@ jobs:
       - name: Download the fixture installer
         env:
           GH_TOKEN: ${{ github.token }}
+          PACKAGE_ID: ${{ inputs.package-id }}
           VERSION: ${{ inputs.version }}
-        run: gh release download "v1.0.0" --repo "$GITHUB_REPOSITORY" --pattern "AttestreeWalk.PushApp-${VERSION}.msi" --dir dist
+        run: gh release download "v1.0.0" --repo "$GITHUB_REPOSITORY" --pattern "${PACKAGE_ID}-${VERSION}.msi" --dir dist
 
       - name: Publish
         uses: attestree/publish@v1
         with:
           instance: ${{ inputs.target == 'customer-zero' && 'https://custzero.attestree.ch' || 'https://agents-homelab.attestree.ch' }}
           audience: ${{ inputs.target == 'customer-zero' && 'attestree:45c552d3-8d50-4962-a4d8-e2590f31bda6' || 'attestree:40ccb360-1b7f-4c65-a41c-a197ff72f7fe' }}
-          package-id: AttestreeWalk.PushApp
+          package-id: ${{ inputs.package-id }}
           version: ${{ inputs.version }}
-          installers: x64=dist/AttestreeWalk.PushApp-${{ inputs.version }}.msi
+          installers: x64=dist/${{ inputs.package-id }}-${{ inputs.version }}.msi
